@@ -1,0 +1,53 @@
+CREATE TABLESPACE SMS_DATA LOGGING DATAFILE 'TSD_SMS.DBF' SIZE 1000M AUTOEXTEND ON NEXT 200M MAXSIZE 1000M;
+CREATE TABLESPACE SMS_INDEX LOGGING DATAFILE 'TSI_SMS.DBF' SIZE 200M AUTOEXTEND ON NEXT 50M MAXSIZE 400M;
+CREATE USER SMS IDENTIFIED BY SMS DEFAULT TABLESPACE SMS_DATA QUOTA UNLIMITED ON SMS_DATA QUOTA UNLIMITED ON SMS_INDEX;
+CREATE USER UP_PORTAL IDENTIFIED BY UP_PORTAL DEFAULT TABLESPACE SMS_DATA QUOTA UNLIMITED ON SMS_DATA QUOTA UNLIMITED ON SMS_INDEX;
+
+
+GRANT CREATE SESSION TO SMS;
+GRANT CREATE PROCEDURE TO SMS;
+GRANT CREATE VIEW TO SMS;
+GRANT CREATE TABLE TO SMS;
+GRANT CREATE SEQUENCE TO SMS;
+GRANT CREATE TRIGGER TO SMS;
+
+run docker
+----------
+docker network create -d bridge my-network
+docker run -d -p 80:80 --name mynemo --network=my-network --volume=c:\docker_root\mynemov3:/var/www/html/public/appumt1 --volume=c:\docker_root\erekod:/var/www/html/public/erekod ismearab/php-oci8
+
+docker run -d -p 80:80 --name appnemo --network=my-network --volume=c:\docker_root\erekod:/var/www/html/public/erekod ismearab/appnemo
+
+docker run -d -p 1521:1521 --name oracleserver --network=my-network --volume=D:\docker:/var/www/html/public/nemo dockjai01/oracledb11g:1.0
+
+docker run -d -p 1521:1521 --name appdb --network=my-network ismearab/appdb
+
+run console into container 
+--------------------------
+docker exec -it testnemo bash
+
+
+CREATE DIRECTORY apptm AS '';
+ 
+expdp system/oracle tables=jawatan,personel,taraf_khidmat,tempat_kerja directory=home_dmp  dumpfile=test_expdp_sms.dmp version=11.2
+ 
+expdp kmskn/kmskn schemas=UP_PORTAL directory=BLOBS dumpfile=up_portal.dmp logfile=expdpSCOTT.log
+
+impdp scott/tiger@db10g schemas=SCOTT directory=TEST_DIR dumpfile=SCOTT.dmp logfile=impdpSCOTT.log
+
+save as image
+-------------
+1) docker ps 
+2) docker commit <nama-container cth mynemo (refer 1)>  <nama-new-images> =>   docker commit  mynemo mynemo2
+3) docker images 
+4) docker tag <IMAGE_ID.. (select row contains <none>) > <nama-container-baru> if belum tag => docker tag 69bacb01cc32 nemoserver 
+
+push to hub
+-----------
+In order to push your image to Docker Hub, first, you can create a new repository in DockerHub. Login to your Docker Hub account > click on Create Repository > provide a name for the repository > make it Public or Private > click on Create.
+
+Afterwards, tag the image you want to push using: 
+
+1) docker login
+2) docker tag <name of the image> <dockerhub username> <name of your repo> <version> => docker tag testrepo rhmuni/testrepo:v2
+3) docker push <dockerhub username> <name of your repo> <version> => docker push  rhmuni/testrepo:v2docker
